@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: web-ingress
 spec:
+  hostNetwork: true
   rules:
   - host: powerapp.kubeprimer.dev
     http:

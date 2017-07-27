@@ -1,16 +1,18 @@
 # Deploying a multi-tier application
 
-In this chapter we are going to deploy a multi-tier micro-services oriented application called `PowerApp`, the application was built for the purpose of this workshop. The application is composed by a `frontend` in `PHP` served by apache, by a `backend` service in `nodejs` and a `mongodb` database. It's a simple listing application where you just add items to your list and they will get persisted.
+In questo capitolo andremo a deployare nel cluster un applicazione multi tier di più microservizi chiamata  `PowerApp`,  l'applicazione è stata creata per questo corso. L'applicazione è composta da un frontend in php servito da apche, un backend in nodejs e un database mongodb.
+E' una semplice app che inserisce in una lista delle stringhe. 
 
-## Goal of this section
+## Obbiettivi
 
-The end goal of this section is to (obviously) have the application running. In order to achieve that, we will have to deploy all the services with their configurations and secrets. Once that is done, we will need to setup the communication between them.  
+Gli obbiettivi sono di avere l'applicazione funzionante. Per poterlo fare dobbiamo deployare tutti i servizi con le loro configurazioni e segreti. Una volta fatto dobbiamo impostare la comunicazione tra loro
 
-The only pod exposed to the outside world is the `frontend`. We will do this in two flavors: via `NodePort` and with an `Ingress`.
+L'unic pod esposto verso il mondo esterno è il `frontend`. Lo faemo in due modi, con la NodePort e con un Ingress.
 
-## Prerequisites: ConfigMaps & Secrets
 
-If you have a look at `deployments/web-deployment.yaml` you will see that states the follow:
+## Prerequisiti: ConfigMaps & Secrets
+
+Se diamo un occhiata a `deployments/web-deployment.yaml` vedremo quanto segue:
 
 ```yaml
 …
@@ -28,9 +30,9 @@ If you have a look at `deployments/web-deployment.yaml` you will see that states
 …
 ```
 
-This means that the deployment depends on both a ConfigMap called `web` and a Secret called `web`.
+Significa che il deployment dipende da una ConfigMap chiamata `web` e un Secret chiamato `web`.
 
-If we try to issue `kubectl create -f deployments/web-deployment.yaml` without having created the ConfigMap and the Secret beforehand, it will result in a failure.
+Se proviamo a lanciare `kubectl create -f deployments/web-deployment.yaml` senza aver creato segreti e configmap, otteniamo un fault.
 
 ```bash
 NAME                            READY     STATUS                       RESTARTS   AGE
@@ -39,7 +41,7 @@ powerapp-web-1507534023-54tpb   0/1       configmaps "web" not found   0        
 powerapp-web-1507534023-cc9f4   0/1       configmaps "web" not found   0          1m
 ```
 
-As first step we **must** create our `ConfigMaps` and `Secrets`.
+come prima cosa **dobbiamo** creare la `ConfigMaps` e il `Secrets`.
 
 ```bash
 kubectl create -f configmaps/powerapp-configmap.yaml
@@ -57,9 +59,9 @@ default-token-p5g8v   kubernetes.io/service-account-token   3         26s
 web                   Opaque                                1         11s
 ```
 
-## Deploying our applications
+## Deploy della nostra applicazione
 
-We can start rolling out our applications in the following way
+Possiamo procedere al deploy con i comandi seguenti
 
 ```bash
 kubectl create -f deployments/web-deployment.yaml
@@ -74,51 +76,92 @@ powerapp-web-1507534023-nxz6c       0/1       ContainerCreating   0          2m
 powerapp-web-1507534023-rndj6       0/1       ContainerCreating   0          2m
 ```
 
-We will soon see that all the deployments end up correctly **except for mongodb**. 
+Tutti i deploy con il tempo saranno avviati **tranne per mongodb**. 
 
-## What is happening?
+## Cosa sta succedendo?
 
-If we want to check the status of what is happening in our cluster, we should use:  
+Per controllare lo stato del nostro cluster dobbiamo usare:  
 
 `kubectl describe pod <pod_name>`  
 `kubectl describe deployment <deployment_name>`  
 `kubectl rollout status deployment/<deployment_name>`  
 
-Can you guess why our mongodb won't get running?
+Perchè allora mongodb non funziona?
 
 ## Volumes
 
-Mongodb is failing because we forgot one of its dependencies: `the volume`. One of the characteristics of Kubernetes is that it lets you handle storage in terms of volumes that your pods will claim when they get scheduled. In this specific case, `mongodb` is requiring to have a volume available, which currently does NOT exists.
+Mongodb non funziona perchè ci siamo dimenticati una delle sue dipendente: `il volume`. 
 
-We can create it:  
+Una delle caratteristiche di Kubernetes è quella di poter gestire lo storage in termini di volumi, che i pod possono reclamare quando vengono schedulati. In questo caso `mongodb` richiede un volume disponibile, che ancora non esiste.
+
+
+Lo possiamo creare:  
 
 `kubectl create -f volumes/kubeprimer-db-persistentvolumeclaim.yaml`
 
-Nice! We have all our deployments correctly getting rolled out and if there are no issues we should see the pods soon getting `Running`.
+##### Postilla, c'è un esempio anche con un volume nfs
 
-yet, we have no idea if the application is running or not and we have no idea if the containers are seeing each others or not.
+*Non usatelo nel corso*
+
+```bash
+kubectl create -f volumes/kubeprimer-db-nfs-pv.yaml
+kubectl create -f volumes/kubeprimer-db-nfs-pvc.yaml
+```
+
+
+
+La stessa cosa si può utilizzare con Ceph, Glusterfs, o altre tipologie di volumi.
+
+##### fine postilla.
+
+Ottimo! ora abbiamo tutti i deployments correttamente lanciati e se non ci sono problemi dovremo vedere tutti i pods `Running`.
+
+Ancora però non sappiamo e la nostra applicazione sia funzionante o meno, e non sappiamo se i container si vedono tra di loro.
+
+
+
 
 ## Services
 
-Now we can start to expose the pods to the outer world and to each others.
+Ora possiamo iniziare a esporre i pods al mondo esterno e tra di loro.
 
-Let's start with `web`. As I mentioned this is the only pod that will be reachable from outside the cluster.
+Iniziamo con `web` . Come detto in precedenza è l'unico pod che sarà raggiungibile dall'esterno del cluster.
+
 
 ```bash
-kubectl create -fservices/web-service-nodeport.yaml
+kubectl create -f services/web-service-nodeport.yaml
 ```
 
-Now, if you do `minikube ip` you can get the IP of the minikube node exposing the service. To get what port is exposing our service, we can use `kubectl get services`. Now visiting `<minikube_ip>:<port>` should show the frontend application.
+Facendo `minikube ip` avrete l'ip del vostro nodo che sta esponendo il servizio.
 
-You are seeing the `NodePort` service in action, where each node of the cluster will expose a random port and serve traffic from your pod there.
+Per sapere in quale porta, possiamo usare `kubectl get services`.
 
-We can now rollout services for `backend` and `mongodb` in a similar way. Once that is done, reloading the frontend page should show no error and magically our application works.
 
-But what is really happening here? Let's discuss this together.
 
-## Exposing applications via Ingress
+Visitando `<minikube_ip>:<port>` dovreste ora vedere l'applicazione funzionare.
 
-So far we have expose the frontend using `NodePort`, but accessing the service with the combination `<ip>:<port>` isn't exactly ideal. Time to see something more advanced: `Ingress`
+In questo momento stiamo vedendo il servizio `NodePort` in azione dove tutti i nodi del cluster espongono una porta random e servono il traffico dei pod
+
+Possiamo ora lanciare i servizi `backend` e `mongodb`. Una volta fatto, la pagina di frontend dovrebbe funzionare correttamente senza errori.
+
+```bash
+kubectl create -f services/backend-service.yaml
+kubectl create -f services/mongo-service.yaml
+```
+
+
+## Esporre i servizi con Ingress
+
+Fin'ora abbiamo esposto il frontendo utilizzando il servizio di tipo `NodePort` ma accedere al servizio con la combinazione `<ip>:<port>` non è proprio ideale
+
+E' ora di vedere qualcosa di più avanzato, `Ingress`
+
+Abilitiamolo con il comando:
 
 `minikube addons enable ingress`
 
+passiamo quindi al deploy del nostro ingress:
+
+```bash
+kubectl create -f ingress/powerapp-ingress.yaml
+```
