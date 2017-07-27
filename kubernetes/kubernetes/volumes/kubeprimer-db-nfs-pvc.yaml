@@ -1,7 +1,9 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: nfs
+  labels:
+      app: powerapp-db-volume
+  name: powerapp-db-volume
 spec:
   accessModes:
     - ReadWriteOnce
