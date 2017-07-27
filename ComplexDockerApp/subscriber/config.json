@@ -1,0 +1,10 @@
+{
+  "amqp": "amqp://rabbitmq",
+  "delaysend": 20000, 
+  "queue": "node-mailing-amqp",
+  "relay": {
+    "port": 25,
+    "host": "postfix",
+    "messagesize" : 10
+  }
+}

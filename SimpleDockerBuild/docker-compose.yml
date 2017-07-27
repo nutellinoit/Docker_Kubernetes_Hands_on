@@ -1,0 +1,26 @@
+version: '2'
+services:
+  wordpress:
+      build: .
+      ports:
+          - "8082:80"
+      networks:
+          main:
+            aliases:
+              - web
+      restart: always
+  db:
+        image: mysql
+        ports:
+            - "3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: 123456
+            MYSQL_USER: userdb
+            MYSQL_PASSWORD: passwordbellina
+            MYSQL_DATABASE: db-wordpress
+        networks:
+            main:
+              aliases:
+                - db
+networks:
+  main:

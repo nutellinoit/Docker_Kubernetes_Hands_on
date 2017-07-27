@@ -1,0 +1,28 @@
+{
+  "name": "node-mailing-amqp",
+  "version": "2.0.0",
+  "description": "Full smtp server using Nodemailer with RabbitMQ and Postfix",
+  "main": "client.js",
+  "scripts": {
+    "test": "grunt",
+    "publish": "node publisher.js",
+    "subscribe": "node subscriber.js"
+  },
+  "keywords": [
+    "nodemailer"
+  ],
+  "author": "Original project Andris Reinman, modified by Samuele Chiocca",
+  "license": "EUPL-1.1",
+  "dependencies": {
+    "amqplib": "^0.5.1",
+    "buffer-concat": "^1.0.0",
+    "iconv": "^2.2.3",
+    "json-prune": "^1.0.1",
+    "mailparser": "^2.0.2",
+    "mailparser-iconv-full": "^2.0.2",
+    "moment": "^2.18.1",
+    "nodemailer": "^3.0.2",
+    "smtp-server": "^2.0.1",
+    "stream-to-string": "^1.1.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "amqp": "amqp://rabbitmq",
+  "queue": "node-mailing-amqp",
+  "publisher":{
+	"port": 25,
+    "host": "0.0.0.0",
+    "messagesize" : 10
+  }
+}

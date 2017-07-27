@@ -1,0 +1,37 @@
+version: '2'
+services:
+  postfix:
+      restart: always
+      build: ./postfix/
+      environment:
+        SMTP_HOSTNAME: "mail.hostname.tld"
+  rabbitmq:
+      restart: always
+      image: rabbitmq
+  publisher:
+    restart: always
+    build: ./publisher/
+    ports:
+      - '25:25'
+    volumes:
+      - ./publisher/:/home/app/publisher/
+      - /home/app/publisher/node_modules
+    links:
+      - rabbitmq
+    depends_on:
+      - rabbitmq
+  subscriber:
+    restart: always
+    build: ./subscriber/
+    links:
+      - rabbitmq
+      - postfix
+    volumes:
+      - ./subscriber/:/home/app/subscriber/
+      - /home/app/subscriber/node_modules
+    depends_on:
+      - rabbitmq
+      - postfix
+
+
+
