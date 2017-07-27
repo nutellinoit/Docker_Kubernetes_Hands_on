@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    # FIXME: use the right IP
+    server: 192.168.1.110
+    path: "/mnt/DroboFS/Shares/Public"
