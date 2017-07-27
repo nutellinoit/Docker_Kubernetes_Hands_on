@@ -3,6 +3,10 @@
 
 # Preparazione dell'ambiente
 
+
+![](https://www.busnet.it/content/images/2017/07/docker-kube-1-2.png)
+
+
 Avrete bisogno un portatile, mac windows o linux.
 
 Sono richiesti i seguenti software installati nella macchina
