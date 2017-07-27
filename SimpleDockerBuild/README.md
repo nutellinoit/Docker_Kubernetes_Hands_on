@@ -1,4 +1,4 @@
-# Avvio di un container semplice
+# Build di un container
 
 In questa cartella è presente un file speciale, chiamato `Dockerfile`
 
