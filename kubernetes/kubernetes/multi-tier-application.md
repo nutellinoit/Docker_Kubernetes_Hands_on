@@ -97,7 +97,10 @@ Una delle caratteristiche di Kubernetes è quella di poter gestire lo storage in
 
 Lo possiamo creare:  
 
-`kubectl create -f volumes/kubeprimer-db-persistentvolumeclaim.yaml`
+
+```bash
+kubectl create -f volumes/kubeprimer-db-persistentvolumeclaim.yaml
+```
 
 ##### Postilla, c'è un esempio anche con un volume nfs
 
