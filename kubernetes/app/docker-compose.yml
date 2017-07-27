@@ -1,0 +1,42 @@
+---
+
+version: "2"
+
+services:
+
+  web:
+    image: "sighup/kubeprimer-web"
+    build:
+      context: ./web
+    environment:
+      - "BACKEND_HOST=backend"
+    ports:
+     - "80:80"
+    links:
+      - "backend"
+    networks:
+      - "kubeprimer"
+
+  backend:
+    image: "sighup/kubeprimer-backend"
+    build:
+      context: ./backend
+    environment:
+      - "MONGO_HOST=mongo"
+    links:
+      - "mongo"
+    networks:
+      - "kubeprimer"
+
+  mongo:
+    image: "mongo:3.0.15"
+    volumes:
+      - "kubeprimer-db:/data/db"
+    networks:
+      - "kubeprimer"
+
+volumes:
+  kubeprimer-db:
+
+networks:
+  kubeprimer:

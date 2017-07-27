@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+    name: prometheus
+spec:
+    replicas: 1
+    template:
+        metadata:
+          labels:
+            app: prometheus
+        spec:
+          containers:
+            # 1 - PROMETHEUS
+          - name: prometheus
+            image: prom/prometheus:v1.7.1
+            ports:
+            - containerPort: 9090
+            volumeMounts:
+            - name: config-volume
+              mountPath: /etc/prometheus
+          # 2 - ALERTMANAGER
+          - name: alertmanager
+            image: prom/alertmanager:v0.7.1
+            ports:
+              - containerPort: 9093
+          # 3 - GRAFANA
+          - name: grafana
+            image: grafana/grafana
+            env:
+              - name: GF_SECURITY_ADMIN_PASSWORD
+                value: admin
+            ports:
+              - containerPort: 3000
+            securityContext:
+              privileged: true
+          volumes:
+          - name: config-volume
+            configMap:
+              name: prometheus
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+  name: grafana
+spec:
+  type: "NodePort"
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: prometheus
+

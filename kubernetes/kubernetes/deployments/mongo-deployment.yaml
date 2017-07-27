@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: powerapp-mongodb
+  name: powerapp-mongodb
+spec:
+  replicas: 1
+  # strategy used to replace old pods by new ones.
+  strategy:
+    type: Recreate # All existing pods are killed before creating new ones
+  template:
+    metadata:
+      labels:
+        app: powerapp-mongodb
+      name: powerapp-mongodb
+    spec:
+      containers:
+      - name: powerapp-mongo
+        image: mongo:3.0.15
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - mountPath: /data/db
+          name: db-data
+      restartPolicy: Always
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: powerapp-db-volume

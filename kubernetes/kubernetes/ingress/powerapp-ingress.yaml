@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: web-ingress
+spec:
+  rules:
+  - host: powerapp.kubeprimer.dev
+    http:
+      paths:
+      - backend:
+          serviceName: powerapp-web-service # questo è il name del service ?
+          servicePort: 80

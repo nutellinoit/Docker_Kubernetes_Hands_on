@@ -1,0 +1,45 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  {:'master01' => {
+      :os         => 'bento/ubuntu-16.04',
+      :hostname   => 'master01',
+      :ip         => '192.168.33.31',
+      :memory     => '4096',
+      :cpus       => 2,
+    },
+    :'node01' => {
+      :os         => 'bento/ubuntu-16.04',
+      :hostname   => 'node01',
+      :ip         => '192.168.33.32',
+      :memory     => '4096',
+      :cpus       => 1,
+    },
+    :'node02' => {
+      :os         => 'bento/ubuntu-16.04',
+      :hostname   => 'node02',
+      :ip         => '192.168.33.33',
+      :memory     => '4096',
+      :cpus       => 1,
+    },
+  }.each do |name, configuration|
+    config.vm.define name do |instance|
+      instance.vm.box = configuration[:os]
+      instance.vm.hostname = configuration[:hostname]
+      instance.vm.network 'private_network', ip: configuration[:ip]
+      instance.vm.synced_folder "..", "/mnt/host", type: "nfs"
+
+      # VirtualBox
+      instance.vm.provider 'virtualbox' do |vb|
+      # Boot in headless mode
+      vb.gui = false
+
+      # VM customization
+      vb.cpus = configuration[:cpus]
+      vb.customize ['modifyvm', :id, '--memory', configuration[:memory]]
+      vb.customize ['modifyvm', :id, '--natnet1', '192.168.199/24']
+      end
+    end
+  end
+end
