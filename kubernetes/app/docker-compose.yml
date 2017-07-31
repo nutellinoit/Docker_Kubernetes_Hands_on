@@ -11,7 +11,7 @@ services:
     environment:
       - "BACKEND_HOST=backend"
     ports:
-     - "80:80"
+     - "85:80"
     links:
       - "backend"
     networks:

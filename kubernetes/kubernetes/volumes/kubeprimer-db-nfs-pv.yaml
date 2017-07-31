@@ -10,5 +10,5 @@ spec:
   storageClassName: nfsnas
   nfs:
     # FIXME: use the right IP
-    server: 192.168.1.110
-    path: "/mnt/DroboFS/Shares/Public"
+    server: 192.168.100.80
+    path: "/nfs/KUBESTORAGE"

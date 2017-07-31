@@ -1,0 +1,13 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  labels:
+      app: powerapp-db-volume
+  name: powerapp-db-volume
+spec:
+  storageClassName: slow
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

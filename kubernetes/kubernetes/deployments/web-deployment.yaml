@@ -5,7 +5,7 @@ metadata:
     app: powerapp-web
   name: powerapp-web
 spec:
-  replicas: 3
+  replicas: 7
   template:
     metadata:
       labels:

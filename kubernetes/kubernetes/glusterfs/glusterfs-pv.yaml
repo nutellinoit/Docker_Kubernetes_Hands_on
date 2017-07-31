@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: datapoint1
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: slow
+  glusterfs:
+    path: /datapoint1
+    endpoints: glusterfs-cluster
+    readOnly: false
